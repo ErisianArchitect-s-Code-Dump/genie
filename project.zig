@@ -1,0 +1,106 @@
+
+const std = @import("std");
+
+const Build = std.Build;
+
+pub const Module = std.Build.Module;
+pub const Import = std.Build.Module.Import;
+
+pub fn imp(name: []const u8, module: *Module) Import {
+    return .{.name = name, .module = module};
+}
+
+pub fn connectModules(modules: []const Import) void {
+    for (modules) |a| {
+        for (modules) |b| {
+            a.module.addImport(b.name, b.module);
+        }
+    }
+}
+
+/// Use a fixed_buffer_capacity that will fit the number of imports
+/// you want to connect. A good recommended size is 16 for small projects,
+/// 32 for medium projects, and 64 or more for much larger ones. But you
+/// can use whatever number you want.
+pub fn Imports(comptime fixed_buffer_capacity: usize) type {
+    return struct {
+        const Self = @This();
+
+        buf: [fixed_buffer_capacity]Import,
+        len: usize,
+
+        pub fn init() Self {
+            return .{.buf = undefined, .len = 0};
+        }
+
+        pub fn slice(self: *const Self) []const Import {
+            return self.buf[0..self.len];
+        }
+
+        pub fn sliceMut(self: *Self) []Import {
+            return self.buf[0..self.len];
+        }
+
+        /// Adds import to the buffer and simultaneously forms a
+        /// two-way connection with the rest of the imports.
+        pub fn connect(self: *Self, import: Import) void {
+            if (self.len >= self.buf.len) @panic("Buffer overflow. Use a higher number for fixed_buffer_capacity, nimwit.");
+            for (self.slice()) |other| {
+                other.module.addImport(import.name, import.module);
+                import.module.addImport(other.name, other.module);
+                import.module.addImport(import.name, import.module);
+            }
+            self.buf[self.len] = import;
+            self.len += 1;
+        }
+
+        pub fn addOptions(self: *Self, name: []const u8, options: *Build.Step.Options) void {
+            if (self.len == 0) @panic("No modules to add options to.");
+            const opts = options.createModule();
+            self.connect(imp(name, opts));
+        }
+    };
+}
+
+pub const Project = struct {
+    const Self = @This();
+    
+    build: *Build,
+
+    pub fn init(build: *Build) Self {
+        return .{.build = build};
+    }
+
+    pub fn addModule(self: *const Self, name: []const u8, options: Module.CreateOptions) *Module {
+        return self.build.addModule(name, options);
+    }
+
+    pub fn createModule(self: *const Self, name: []const u8, options: Module.CreateOptions) *Module {
+        return self.build.createModule(name, options);
+    }
+
+    pub fn dupedAddModule(self: *const Self, comptime count: usize, name: []const u8, options: Module.CreateOptions) [count]*Module {
+        var modules: [count]*Module = undefined;
+        inline for(0..count) |i| {
+            modules[i] = self.build.addModule(name, options);
+        }
+        return modules;
+    }
+
+    pub fn dupedCreateModule(
+            self: *const Self,
+            comptime count: usize,
+            options: Module.CreateOptions,
+        ) [count]*Module {
+        var modules: [count]*Module = undefined;
+        inline for(0..count) |i| {
+            modules[i] = self.build.createModule(options);
+        }
+        return modules;
+    }
+
+    pub fn path(self: *const Self, sub_path: []const u8) Build.LazyPath {
+        return self.build.path(sub_path);
+    }
+};
+

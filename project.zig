@@ -96,6 +96,11 @@ pub fn BuildCheckImports(comptime buffer_size: usize) type {
             self.connect(name, modules[0], modules[1]);
         }
 
+        pub fn addDependency(self: *Self, name: []const u8, build_dep: *Module, check_dep: ?*Module) void {
+            self.build.addDependency(name, build_dep);
+            self.check.addDependency(name, check_dep orelse build_dep);
+        }
+
         pub fn addOptions(self: *Self, name: []const u8, build_options: *Build.Step.Options, check_options: *Build.Step.Options) void {
             self.build.addOptions(name, build_options);
             self.check.addOptions(name, check_options);

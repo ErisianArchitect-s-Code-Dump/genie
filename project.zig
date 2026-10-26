@@ -77,6 +77,10 @@ pub fn BuildCheckImports(comptime buffer_size: usize) type {
             self.build.connect(imp(name, build_module));
             self.check.connect(imp(name, check_module));
         }
+
+        pub fn connectDuped(self: *Self, name: []const u8, modules: [2]*Module) void {
+            self.connect(name, modules[0], modules[1]);
+        }
     };
 }
 

@@ -1,4 +1,6 @@
 
+// Test: 0
+
 const std = @import("std");
 
 const Build = std.Build;
@@ -88,8 +90,6 @@ pub fn BuildCheckImports(comptime buffer_size: usize) type {
         }
     };
 }
-
-pub const HERE = "here";
 
 pub const Project = struct {
     const Self = @This();

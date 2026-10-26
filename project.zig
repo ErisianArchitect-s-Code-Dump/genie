@@ -81,6 +81,11 @@ pub fn BuildCheckImports(comptime buffer_size: usize) type {
         pub fn connectDuped(self: *Self, name: []const u8, modules: [2]*Module) void {
             self.connect(name, modules[0], modules[1]);
         }
+
+        pub fn addOptions(self: *Self, name: []const u8, build_options: *Build.Step.Options, check_options: *Build.Step.Options) void {
+            self.build.addOptions(name, build_options);
+            self.check.addOptions(name, check_options);
+        }
     };
 }
 

@@ -126,10 +126,10 @@ pub const Project = struct {
     }
 
     pub fn dupedCreateModule(
-            self: *const Self,
-            comptime count: usize,
-            options: Module.CreateOptions,
-        ) [count]*Module {
+        self: *const Self,
+        comptime count: usize,
+        options: Module.CreateOptions,
+    ) [count]*Module {
         var modules: [count]*Module = undefined;
         inline for(0..count) |i| {
             modules[i] = self.build.createModule(options);

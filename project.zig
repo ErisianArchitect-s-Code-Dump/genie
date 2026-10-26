@@ -58,6 +58,14 @@ pub fn Imports(comptime fixed_buffer_capacity: usize) type {
             self.len += 1;
         }
 
+        /// This should be done after all modules are connected but before options are added..
+        pub fn addDependency(self: *Self, name: []const u8, module: *Module) void {
+            for (self.slice()) |m| {
+                m.module.addImport(name, module);
+            }
+        }
+
+        /// This should be done after all modules are connected but after dependencies are added.
         pub fn addOptions(self: *Self, name: []const u8, options: *Build.Step.Options) void {
             if (self.len == 0) @panic("No modules to add options to.");
             const opts = options.createModule();

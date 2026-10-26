@@ -12,9 +12,11 @@ pub fn imp(name: []const u8, module: *Module) Import {
     return .{.name = name, .module = module};
 }
 
-pub fn connectModules(modules: []const Import) void {
-    for (modules) |a| {
-        for (modules) |b| {
+/// Connect modules together using `addImport`. This will connect every module
+/// to every other module.
+pub fn connectImports(imports: []const Import) void {
+    for (imports) |a| {
+        for (imports) |b| {
             a.module.addImport(b.name, b.module);
         }
     }

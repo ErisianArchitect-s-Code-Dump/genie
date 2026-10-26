@@ -62,6 +62,24 @@ pub fn Imports(comptime fixed_buffer_capacity: usize) type {
     };
 }
 
+pub fn BuildCheckImports(comptime buffer_size: usize) type {
+    return struct {
+        const Self = @This();
+
+        build: Imports(buffer_size),
+        check: Imports(buffer_size),
+
+        pub fn init() Self {
+            return .{.build = .init(), .check = .init()};
+        }
+
+        pub fn connect(self: *Self, name: []const u8, build_module: *Module, check_module: *Module) void {
+            self.build.connect(imp(name, build_module));
+            self.check.connect(imp(name, check_module));
+        }
+    };
+}
+
 pub const Project = struct {
     const Self = @This();
     

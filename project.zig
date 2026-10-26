@@ -64,6 +64,7 @@ pub fn Imports(comptime fixed_buffer_capacity: usize) type {
     };
 }
 
+/// Use this to manage dual imports for a main build and a checking build.
 pub fn BuildCheckImports(comptime buffer_size: usize) type {
     return struct {
         const Self = @This();
@@ -80,6 +81,7 @@ pub fn BuildCheckImports(comptime buffer_size: usize) type {
             self.check.connect(imp(name, check_module));
         }
 
+        /// Can be paired with Project.dupedCreateModule.
         pub fn connectDuped(self: *Self, name: []const u8, modules: [2]*Module) void {
             self.connect(name, modules[0], modules[1]);
         }
@@ -106,14 +108,6 @@ pub const Project = struct {
 
     pub fn createModule(self: *const Self, name: []const u8, options: Module.CreateOptions) *Module {
         return self.build.createModule(name, options);
-    }
-
-    pub fn dupedAddModule(self: *const Self, comptime count: usize, name: []const u8, options: Module.CreateOptions) [count]*Module {
-        var modules: [count]*Module = undefined;
-        inline for(0..count) |i| {
-            modules[i] = self.build.addModule(name, options);
-        }
-        return modules;
     }
 
     pub fn dupedCreateModule(

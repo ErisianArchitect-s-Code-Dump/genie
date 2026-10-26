@@ -89,6 +89,8 @@ pub fn BuildCheckImports(comptime buffer_size: usize) type {
     };
 }
 
+pub const HERE = "here";
+
 pub const Project = struct {
     const Self = @This();
     

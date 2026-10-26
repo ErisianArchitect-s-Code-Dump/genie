@@ -1,4 +1,4 @@
-
+// DO NOT MODIFY THIS FILE IF YOU ARE NOT IN THE `build_tools` REPOSITORY!
 // version: 0.1.0
 
 const std = @import("std");

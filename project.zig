@@ -1,5 +1,5 @@
 
-// Test: 0
+// version: 0.1.0
 
 const std = @import("std");
 
